@@ -3,7 +3,7 @@ const { sendConfirmationEmail } = require('../services/emailService');
 
 // POST /events: Create a new event
 exports.createEvent = async (req, res) => {
-  const { title, description, type, date, capacity } = req.body;
+  const { title, description, type, category, images, date, capacity, mentor_bio, registration_deadline } = req.body;
   
   if (!title || !type || !date || !capacity) {
     return res.status(400).json({ error: 'Please provide all required fields (title, type, date, capacity).' });
@@ -11,8 +11,8 @@ exports.createEvent = async (req, res) => {
 
   try {
     const result = await db.query(
-      'INSERT INTO events (title, description, type, date, capacity) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [title, description, type, date, capacity]
+      'INSERT INTO events (title, description, type, category, images, date, capacity, mentor_bio, registration_deadline) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      [title, description, type, category || null, images || [], date, capacity, mentor_bio || null, registration_deadline || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -23,8 +23,25 @@ exports.createEvent = async (req, res) => {
 
 // GET /events: Fetch all events with their current status
 exports.getEvents = async (req, res) => {
+  const { category } = req.query;
+
   try {
-    const result = await db.query('SELECT * FROM events ORDER BY date ASC');
+    let queryStr = `
+      SELECT e.*, COUNT(r.id) AS current_registrations 
+      FROM events e 
+      LEFT JOIN registrations r ON e.id = r.event_id 
+    `;
+    const params = [];
+    
+    if (category) {
+      queryStr += ` WHERE e.category = $1 `;
+      params.push(category);
+    }
+
+    queryStr += ` GROUP BY e.id ORDER BY e.date ASC`;
+
+    const result = await db.query(queryStr, params);
+    
     const events = result.rows.map(event => {
       const eventDate = new Date(event.date);
       const now = new Date();
@@ -38,6 +55,7 @@ exports.getEvents = async (req, res) => {
 
       return {
         ...event,
+        current_registrations: parseInt(event.current_registrations, 10),
         status
       };
     });
