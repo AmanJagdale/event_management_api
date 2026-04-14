@@ -3,7 +3,7 @@ const { sendConfirmationEmail } = require('../services/emailService');
 
 // POST /events: Create a new event
 exports.createEvent = async (req, res) => {
-  const { title, description, type, category, images, date, capacity, mentor_bio, registration_deadline } = req.body;
+  const { title, description, type, category, date, capacity } = req.body;
   
   if (!title || !type || !date || !capacity) {
     return res.status(400).json({ error: 'Please provide all required fields (title, type, date, capacity).' });

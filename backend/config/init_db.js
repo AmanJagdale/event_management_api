@@ -27,11 +27,8 @@ const createTables = async () => {
       description TEXT,
       type VARCHAR(50) NOT NULL CHECK (type IN ('workshop', 'seminar')),
       category VARCHAR(100),
-      images TEXT[],
       date TIMESTAMP NOT NULL,
       capacity INT NOT NULL,
-      mentor_bio TEXT,
-      registration_deadline TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;

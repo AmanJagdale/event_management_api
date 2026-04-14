@@ -24,10 +24,10 @@ export default function Profile() {
     >
       <div className="flex items-center gap-6 mb-8 border-b border-gray-100 pb-8">
         <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center text-white text-4xl shadow-glow">
-          {profile.name?.charAt(0).toUpperCase()}
+          {profile.email?.charAt(0).toUpperCase()}
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">{profile.name}</h1>
+          <h1 className="text-3xl font-bold text-gray-800">{profile.email.split('@')[0]}</h1>
           <p className="text-gray-500 capitalize">{profile.role}</p>
         </div>
       </div>

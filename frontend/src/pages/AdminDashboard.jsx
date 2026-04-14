@@ -213,8 +213,8 @@ export default function AdminDashboard() {
               {members.map(m => (
                 <div key={m.id} className="p-3 bg-white/50 rounded-xl border border-gray-100 flex justify-between items-center text-sm">
                   <div>
-                    <p className="font-bold text-gray-800">ID: {m.id} | {m.name}</p>
-                    <p className="text-gray-500">{m.email} - {m.role}</p>
+                    <p className="font-bold text-gray-800">ID: {m.id} | {m.email}</p>
+                    <p className="text-gray-500">{m.role}</p>
                   </div>
                 </div>
               ))}
