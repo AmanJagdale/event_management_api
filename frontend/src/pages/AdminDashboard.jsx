@@ -13,6 +13,14 @@ export default function AdminDashboard() {
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventForm, setEventForm] = useState({ title: "", type: "workshop", category: "", date: "", capacity: 50, description: "" });
 
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const showMessage = (msg, isError = false) => {
+    if (isError) setErrorMsg(msg);
+    else setSuccessMsg(msg);
+    setTimeout(() => { setErrorMsg(""); setSuccessMsg(""); }, 4000);
+  };
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -21,7 +29,7 @@ export default function AdminDashboard() {
 
   const fetchQuotes = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/quotes");
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/quotes");
       if (res.ok) {
         const data = await res.json();
         setQuotes(data);
@@ -33,13 +41,13 @@ export default function AdminDashboard() {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return alert("Please select a file.");
+    if (!file) return showMessage("Please select a file.", true);
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/admin/upload-members", {
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/users/admin/upload-members", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -48,23 +56,23 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Upload successful!");
+        showMessage("Upload successful!");
         setFile(null);
         const fileInput = document.getElementById("csv-upload");
         if (fileInput) fileInput.value = "";
       } else {
-        alert(data.error || "Upload failed");
+        showMessage(data.error || "Upload failed", true);
       }
     } catch (err) {
       console.error(err);
-      alert("Upload error.");
+      showMessage("Upload error.", true);
     }
   };
 
   const handleAddQuote = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/quotes", {
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/quotes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,18 +85,19 @@ export default function AdminDashboard() {
         fetchQuotes();
         setNewQuote("");
         setNewAuthor("");
+        showMessage("Quote added successfully!");
       } else {
-        alert(data.error || "Failed to add quote.");
+        showMessage(data.error || "Failed to add quote.", true);
       }
     } catch (err) {
       console.error(err);
-      alert("Error adding quote.");
+      showMessage("Error adding quote.", true);
     }
   };
 
   const handleDeleteQuote = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/quotes/${id}`, {
+      const res = await fetch(`https://wdc-udaan-backend.onrender.com/api/quotes/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,12 +105,13 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         fetchQuotes();
+        showMessage("Quote deleted!");
       } else {
-        alert("Failed to delete quote.");
+        showMessage("Failed to delete quote.", true);
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting quote.");
+      showMessage("Error deleting quote.", true);
     }
   };
 
@@ -110,7 +120,7 @@ export default function AdminDashboard() {
     if (!deleteTarget) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${deleteTarget}`, {
+      const res = await fetch(`https://wdc-udaan-backend.onrender.com/api/users/${deleteTarget}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +128,7 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Member deleted successfully.");
+        showMessage("Member deleted successfully.");
         if (deleteTarget === localStorage.getItem("userId")) {
           localStorage.clear();
           window.location.href = "/login";
@@ -126,11 +136,11 @@ export default function AdminDashboard() {
         }
         setDeleteTarget("");
       } else {
-        alert(data.error || "Failed to delete member.");
+        showMessage(data.error || "Failed to delete member.", true);
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting member.");
+      showMessage("Error deleting member.", true);
     }
   };
 
@@ -140,7 +150,7 @@ export default function AdminDashboard() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/users", {
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -156,7 +166,7 @@ export default function AdminDashboard() {
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/events", {
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -165,21 +175,31 @@ export default function AdminDashboard() {
         body: JSON.stringify(eventForm)
       });
       if (res.ok) {
-        alert("Event created successfully!");
+        showMessage("Event created successfully!");
         setEventForm({ title: '', type: 'workshop', category: '', date: '', capacity: 50, description: '' });
         setShowEventForm(false);
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to create event");
+        showMessage(data.error || "Failed to create event", true);
       }
     } catch (err) {
       console.error(err);
-      alert("Error creating event");
+      showMessage("Error creating event", true);
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {errorMsg && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl bg-red-100 text-red-600 font-bold shadow-lg">
+          {errorMsg}
+        </div>
+      )}
+      {successMsg && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl bg-green-100 text-green-600 font-bold shadow-lg">
+          {successMsg}
+        </div>
+      )}
       {/* Header */}
       <motion.div
         className="glass-card p-8"
@@ -272,7 +292,7 @@ export default function AdminDashboard() {
             {quotes.map((q) => (
               <div key={q.id || q._id} className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-gray-100">
                 <div>
-                  <p className="font-medium text-gray-800">"{q.text}"</p>
+                  <p className="font-medium text-[#4A4A4A]">"{q.text}"</p>
                   <p className="text-sm text-gray-500">- {q.author || "Unknown"}</p>
                 </div>
                 <button

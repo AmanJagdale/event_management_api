@@ -22,8 +22,6 @@ export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
-    studentId: "",
     password: "",
     confirmPassword: "",
     role: "student",
@@ -47,15 +45,13 @@ export default function Register() {
     try {
       let finalRole = formData.role;
       // You can add logic to securely process roles in backend if needed.
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch("https://wdc-udaan-backend.onrender.com/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          phone: formData.mobile,
-          student_id: formData.studentId,
           role: finalRole,
         }),
       });
@@ -96,7 +92,7 @@ export default function Register() {
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-100 bg-clip-text mb-4">
                   Welcome to WDC-Connect
                 </h2>
-                <p className="text-xl text-white/90 max-w-md mx-auto leading-relaxed">
+                <p className="text-xl text-[#4A4A4A] max-w-md mx-auto leading-relaxed">
                   Join our safe community dedicated to empower and support women
                   on campus.
                 </p>
@@ -122,7 +118,7 @@ export default function Register() {
                 <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
                   <ShieldCheck className="w-8 h-8 text-white" />
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 mb-3">
+                <h1 className="text-3xl font-bold mb-3">
                   Create Account
                 </h1>
                 <p className="text-gray-600">
@@ -188,65 +184,23 @@ export default function Register() {
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <input
-                            type="email"
-                            required
-                            className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                            placeholder="your.email@university.edu"
-                            value={formData.email}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                email: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Mobile
-                        </label>
-                        <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <input
-                            type="tel"
-                            className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                            placeholder="999-999-9999"
-                            value={formData.mobile}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                mobile: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Student/Faculty ID
+                        Email
                       </label>
                       <div className="relative">
-                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
-                          type="text"
+                          type="email"
+                          required
                           className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                          placeholder="e.g., 2023CS00123"
-                          value={formData.studentId}
+                          placeholder="your.email@university.edu"
+                          value={formData.email}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              studentId: e.target.value,
+                              email: e.target.value,
                             })
                           }
                         />
