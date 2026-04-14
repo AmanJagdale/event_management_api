@@ -3,10 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 exports.register = async (req, res) => {
-  let { name, email, password, role } = req.body;
-  if (!name && email) {
-    name = email.split('@')[0];
-  }
+  let { email, password, role } = req.body;
 
   try {
     // Check if user exists
@@ -21,8 +18,8 @@ exports.register = async (req, res) => {
 
     // Insert user
     const newUser = await db.query(
-      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
-      [name, email, hashedPassword, role || 'member']
+      'INSERT INTO users (email, password, role) VALUES ($1, $2, $3) RETURNING id, email, role',
+      [email, hashedPassword, role || 'member']
     );
 
     res.status(201).json({ message: 'User registered successfully', user: newUser.rows[0] });
@@ -56,7 +53,7 @@ exports.login = async (req, res) => {
     // Generate JWT
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({ message: 'Login successful', token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error during login.' });

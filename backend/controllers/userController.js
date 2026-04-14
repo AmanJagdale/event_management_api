@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 exports.getProfile = async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
+      'SELECT id, email, role, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     if (result.rows.length === 0) {
@@ -40,9 +40,9 @@ exports.bulkUploadMembers = async (req, res) => {
 
         for (const row of results) {
           console.log('Received CSV Row:', row);
-          const { name, email, role } = row;
+          const { email, role } = row;
           
-          if (!name || !email) {
+          if (!email) {
             errorCount++;
             continue;
           }
@@ -51,11 +51,11 @@ exports.bulkUploadMembers = async (req, res) => {
           const hashedPassword = await bcrypt.hash("ChangeMe123!", salt);
           
           await db.query(
-            `INSERT INTO users (name, email, password, role) 
-             VALUES ($1, $2, $3, $4) 
+            `INSERT INTO users (email, password, role) 
+             VALUES ($1, $2, $3) 
              ON CONFLICT (email) 
-             DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role`,
-            [name, email, hashedPassword, role || 'member']
+             DO UPDATE SET role = EXCLUDED.role`,
+            [email, hashedPassword, role || 'member']
           );
           successCount++;
         }
@@ -135,7 +135,7 @@ exports.getImpactMeter = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC'
+      'SELECT id, email, role, created_at FROM users ORDER BY created_at DESC'
     );
     res.json(result.rows);
   } catch (err) {
