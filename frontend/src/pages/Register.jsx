@@ -13,9 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const roles = [
-  { id: "student", label: "Student", icon: School },
-  { id: "faculty", label: "Faculty", icon: User },
-  { id: "staff", label: "Staff", icon: User },
+  { id: "member", label: "Member", icon: User },
+  { id: "admin", label: "Admin", icon: ShieldCheck },
 ];
 
 export default function Register() {
@@ -30,14 +29,18 @@ export default function Register() {
     role: "student",
     agreeTerms: false,
   });
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
 
   const registerTabs = ["Personal Info", "Verification", "Password"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setErrorMsg("Passwords do not match");
       return;
     }
     
@@ -59,14 +62,14 @@ export default function Register() {
 
       const data = await response.json();
       if (response.ok) {
-        alert("Registration successful! Please login.");
-        navigate("/login");
+        setSuccessMsg("Registration successful! Please login.");
+        setTimeout(() => navigate("/login"), 2000);
       } else {
-        alert(data.error || "Registration failed");
+        setErrorMsg(data.error || "Registration failed");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred during registration. Please try again.");
+      setErrorMsg("An error occurred during registration. Please try again.");
     }
   };
 
@@ -125,6 +128,17 @@ export default function Register() {
                 <p className="text-gray-600">
                   Join WDC-Connect in 3 simple steps
                 </p>
+
+                {errorMsg && (
+                  <div className="mt-4 p-3 rounded-xl bg-red-100 text-red-600 text-center text-sm font-medium">
+                    {errorMsg}
+                  </div>
+                )}
+                {successMsg && (
+                  <div className="mt-4 p-3 rounded-xl bg-green-100 text-green-600 text-center text-sm font-medium">
+                    {successMsg}
+                  </div>
+                )}
 
                 {/* Progress */}
                 <div className="flex items-center justify-center gap-2 mt-8 mb-2">

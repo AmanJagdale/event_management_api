@@ -1,21 +1,31 @@
 import { motion } from "framer-motion";
-import { Mail, Phone, Hash, User, Lock, ChevronLeft } from "lucide-react";
+import { Mail, User, Lock, ChevronLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const loginTabs = ["Email", "Mobile", "Student ID"];
+
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "student",
+    role: "member",
   });
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
@@ -38,11 +48,11 @@ export default function Login() {
           navigate("/home");
         }
       } else {
-        alert(data.error || "Login failed");
+        setErrorMsg(data.error || "Wrong credentials");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred during login. Please try again.");
+      setErrorMsg("An error occurred during login. Please try again.");
     }
   };
 
@@ -68,38 +78,19 @@ export default function Login() {
             <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-pink-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-glow-lg">
               <span className="text-3xl font-bold text-white">W</span>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 mb-2">
+            <h1 className="text-3xl font-bold mb-2">
               Welcome Back
             </h1>
             <p className="text-gray-600">Sign in to your account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Login method tabs */}
-            <div className="flex bg-white/50 rounded-2xl p-1">
-              {loginTabs.map((tab, index) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
-                    activeTab === index
-                      ? "bg-gradient-to-r from-primary-500 to-pink-400 text-white shadow-glow"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                  onClick={() => setActiveTab(index)}
-                >
-                  {tab === "Email" && <Mail className="w-4 h-4 inline mr-2" />}
-                  {tab === "Mobile" && (
-                    <Phone className="w-4 h-4 inline mr-2" />
-                  )}
-                  {tab === "Student ID" && (
-                    <Hash className="w-4 h-4 inline mr-2" />
-                  )}
-                  {tab}
-                </button>
-              ))}
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded-xl bg-red-100 text-red-600 text-center text-sm font-medium">
+              {errorMsg}
             </div>
+          )}
 
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Form fields */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -150,9 +141,7 @@ export default function Login() {
                   setFormData({ ...formData, role: e.target.value })
                 }
               >
-                <option value="student">Student</option>
-                <option value="faculty">Faculty</option>
-                <option value="staff">Staff</option>
+                <option value="member">Member</option>
                 <option value="admin">Admin</option>
               </select>
             </div>

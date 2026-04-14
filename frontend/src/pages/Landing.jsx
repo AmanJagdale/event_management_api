@@ -38,7 +38,7 @@ export default function Landing() {
             </span>
           </motion.h1>
 
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-[#2C3E50] mb-12 max-w-2xl mx-auto leading-relaxed">
             Women Development Cell platform for campus safety, events, and
             community support. Your voice matters.
           </p>
