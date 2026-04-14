@@ -12,13 +12,15 @@ export default function Register() {
   const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
 
+  const API_BASE_URL = "https://wdc-udaan-backend.onrender.com/api";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
 
     try {
-      const response = await fetch("https://wdc-udaan-backend.onrender.com/api/auth/register", {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

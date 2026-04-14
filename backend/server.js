@@ -18,6 +18,8 @@ app.use((req, res, next) => {
 app.use(cors({ origin: true, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] }));
 app.use(express.json()); // Parses incoming JSON requests
 
+app.options('*', cors());
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
@@ -26,7 +28,7 @@ app.use('/api/users', userRoutes);
 
 // Base route for testing
 app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to the Event/Workshop Management System API' });
+    res.send('Backend is Alive');
 });
 
 // Impact Meter Feature

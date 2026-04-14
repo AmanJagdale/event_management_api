@@ -14,6 +14,8 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
+  const API_BASE_URL = "https://wdc-udaan-backend.onrender.com/api";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
@@ -26,7 +28,7 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch("https://wdc-udaan-backend.onrender.com/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
