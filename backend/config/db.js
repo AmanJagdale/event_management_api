@@ -1,6 +1,9 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Log to Render console exactly what is seen
+console.log("Database Engine Check: process.env.DATABASE_URL is", process.env.DATABASE_URL ? "CONFIGURED IN ENVIRONMENT" : "MISSING/UNDEFINED!");
+
 // This tells the backend to use the long URL from your .env file
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
