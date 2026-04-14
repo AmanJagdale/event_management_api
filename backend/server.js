@@ -10,10 +10,12 @@ const userRoutes = require('./routes/userRoutes');
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: 'https://wdc-udaan.vercel.app',
-    credentials: true
-}));
+app.use((req, res, next) => {
+    console.log('Server is running and hit at:', req.url);
+    next();
+});
+
+app.use(cors({ origin: true, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] }));
 app.use(express.json()); // Parses incoming JSON requests
 
 // Routes
