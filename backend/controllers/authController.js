@@ -3,7 +3,10 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 exports.register = async (req, res) => {
-  const { name, email, password, phone, student_id, role } = req.body;
+  let { name, email, password, role } = req.body;
+  if (!name && email) {
+    name = email.split('@')[0];
+  }
 
   try {
     // Check if user exists
@@ -18,8 +21,8 @@ exports.register = async (req, res) => {
 
     // Insert user
     const newUser = await db.query(
-      'INSERT INTO users (name, email, password, phone, student_id, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, name, email, role',
-      [name, email, hashedPassword, phone || null, student_id || null, role || 'member']
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
+      [name, email, hashedPassword, role || 'member']
     );
 
     res.status(201).json({ message: 'User registered successfully', user: newUser.rows[0] });
@@ -33,9 +36,9 @@ exports.login = async (req, res) => {
   const { identifier, password } = req.body;
 
   try {
-    // Find user by email, phone, or student_id
+    // Find user by email
     const result = await db.query(
-      'SELECT * FROM users WHERE email = $1 OR phone = $1 OR student_id = $1', 
+      'SELECT * FROM users WHERE email = $1', 
       [identifier]
     );
     if (result.rows.length === 0) {

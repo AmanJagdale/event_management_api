@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 exports.getProfile = async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT id, name, email, role, bio, profile_pic, phone, created_at FROM users WHERE id = $1',
+      'SELECT id, name, email, role, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
     if (result.rows.length === 0) {
@@ -40,7 +40,7 @@ exports.bulkUploadMembers = async (req, res) => {
 
         for (const row of results) {
           console.log('Received CSV Row:', row);
-          const { name, email, phone, student_id, role } = row;
+          const { name, email, role } = row;
           
           if (!name || !email) {
             errorCount++;
@@ -51,11 +51,11 @@ exports.bulkUploadMembers = async (req, res) => {
           const hashedPassword = await bcrypt.hash("ChangeMe123!", salt);
           
           await db.query(
-            `INSERT INTO users (name, email, password, phone, student_id, role) 
-             VALUES ($1, $2, $3, $4, $5, $6) 
+            `INSERT INTO users (name, email, password, role) 
+             VALUES ($1, $2, $3, $4) 
              ON CONFLICT (email) 
-             DO UPDATE SET name = EXCLUDED.name, phone = EXCLUDED.phone, student_id = EXCLUDED.student_id, role = EXCLUDED.role`,
-            [name, email, hashedPassword, phone || null, student_id || null, role || 'member']
+             DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role`,
+            [name, email, hashedPassword, role || 'member']
           );
           successCount++;
         }
@@ -135,7 +135,7 @@ exports.getImpactMeter = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT id, name, email, phone, student_id, role, created_at FROM users ORDER BY created_at DESC'
+      'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC'
     );
     res.json(result.rows);
   } catch (err) {

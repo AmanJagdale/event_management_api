@@ -17,10 +17,6 @@ const createTables = async () => {
       email VARCHAR(100) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
       role VARCHAR(50) DEFAULT 'member',
-      bio TEXT,
-      profile_pic TEXT,
-      phone VARCHAR(20),
-      student_id VARCHAR(50) UNIQUE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -61,15 +57,7 @@ const createTables = async () => {
     );
   `;
 
-  const quotesTable = `
-    CREATE TABLE IF NOT EXISTS quotes (
-      id SERIAL PRIMARY KEY,
-      text TEXT NOT NULL,
-      author VARCHAR(255),
-      is_active BOOLEAN DEFAULT true,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+
 
   const adminLogsTable = `
     CREATE TABLE IF NOT EXISTS admin_logs (
@@ -96,8 +84,7 @@ const createTables = async () => {
     await pool.query(notificationsTable);
     console.log('✅ Notifications table verified.');
 
-    await pool.query(quotesTable);
-    console.log('✅ Quotes table verified.');
+
 
     await pool.query(adminLogsTable);
     console.log('✅ Admin Logs table verified.');

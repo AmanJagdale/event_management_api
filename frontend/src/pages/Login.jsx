@@ -10,7 +10,6 @@ export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "member",
   });
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
@@ -130,21 +129,7 @@ export default function Login() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Role
-              </label>
-              <select
-                className="w-full px-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20 focus:border-transparent transition-all duration-200 appearance-none bg-no-repeat bg-right"
-                value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
-              >
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
+
 
             <button
               type="submit"

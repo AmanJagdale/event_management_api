@@ -1,58 +1,30 @@
 import { motion } from "framer-motion";
-import {
-  ChevronLeft,
-  Mail,
-  Phone,
-  Hash,
-  User,
-  Lock,
-  ShieldCheck,
-  School,
-} from "lucide-react";
+import { ChevronLeft, Mail, Lock, ShieldCheck, School } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const roles = [
-  { id: "member", label: "Member", icon: User },
-  { id: "admin", label: "Admin", icon: ShieldCheck },
-];
-
 export default function Register() {
-  const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    role: "student",
-    agreeTerms: false,
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const navigate = useNavigate();
 
-  const registerTabs = ["Personal Info", "Verification", "Password"];
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
-    if (formData.password !== formData.confirmPassword) {
-      setErrorMsg("Passwords do not match");
-      return;
-    }
-    
+
     try {
-      let finalRole = formData.role;
-      // You can add logic to securely process roles in backend if needed.
       const response = await fetch("https://wdc-udaan-backend.onrender.com/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: finalRole,
+          role: "member",
         }),
       });
 
@@ -122,7 +94,7 @@ export default function Register() {
                   Create Account
                 </h1>
                 <p className="text-gray-600">
-                  Join WDC-Connect in 3 simple steps
+                  Join WDC-Connect in 1 simple step
                 </p>
 
                 {errorMsg && (
@@ -135,223 +107,60 @@ export default function Register() {
                     {successMsg}
                   </div>
                 )}
-
-                {/* Progress */}
-                <div className="flex items-center justify-center gap-2 mt-8 mb-2">
-                  {[1, 2, 3].map((stepNum) => (
-                    <div
-                      key={stepNum}
-                      className={`w-10 h-2 rounded-full ${
-                        stepNum <= activeTab + 1
-                          ? "bg-gradient-to-r from-primary-500 to-pink-400"
-                          : "bg-gray-200"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="flex justify-center gap-6 text-xs text-gray-500">
-                  {registerTabs.map((tab, index) => (
-                    <span
-                      key={tab}
-                      className={`font-medium ${activeTab >= index ? "text-primary-600" : ""}`}
-                    >
-                      {tab}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Step 1: Personal Info */}
-                {activeTab === 0 && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                          placeholder="Enter your full name"
-                          value={formData.name}
-                          onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      required
+                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
+                      placeholder="your.email@university.edu"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      required
+                      className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
+                      placeholder="Create strong password"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          password: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="email"
-                          required
-                          className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                          placeholder="your.email@university.edu"
-                          value={formData.email}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              email: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="gradient-btn w-full py-4 text-lg"
-                      onClick={() => setActiveTab(1)}
-                    >
-                      Continue to Verification
-                    </button>
-                  </>
-                )}
-
-                {/* Step 2: Role */}
-                {activeTab === 1 && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-6 text-center">
-                        Select your role
-                      </label>
-                      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                        {roles.map((role) => (
-                          <motion.button
-                            key={role.id}
-                            type="button"
-                            className={`glass-card p-6 hover:shadow-glow-lg transition-all flex flex-col items-center gap-3 border-2 ${
-                              formData.role === role.id
-                                ? "border-primary-300 ring-2 ring-primary-500/30"
-                                : "border-transparent"
-                            }`}
-                            onClick={() =>
-                              setFormData((prev) => ({
-                                ...prev,
-                                role: role.id,
-                              }))
-                            }
-                            whileHover={{ y: -3 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-pink-400 rounded-2xl flex items-center justify-center shadow-glow">
-                              <role.icon className="w-8 h-8 text-white" />
-                            </div>
-                            <span className="font-semibold text-gray-800">
-                              {role.label}
-                            </span>
-                          </motion.button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-white/30">
-                      <button
-                        type="button"
-                        className="gradient-btn w-full py-4 text-lg"
-                        onClick={() => setActiveTab(2)}
-                        disabled={!formData.role}
-                      >
-                        Continue to Password
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* Step 3: Password */}
-                {activeTab === 2 && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="password"
-                          required
-                          className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                          placeholder="Create strong password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              password: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Confirm Password
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="password"
-                          required
-                          className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl bg-white/50 backdrop-blur-sm focus:ring-4 focus:ring-primary-500/20"
-                          placeholder="Repeat password"
-                          value={formData.confirmPassword}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              confirmPassword: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        id="terms"
-                        type="checkbox"
-                        required
-                        className="w-5 h-5 text-primary-600 bg-white/50 border-gray-300 rounded focus:ring-primary-500"
-                        checked={formData.agreeTerms}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            agreeTerms: e.target.checked,
-                          }))
-                        }
-                      />
-                      <label
-                        htmlFor="terms"
-                        className="ml-3 text-sm text-gray-700 cursor-pointer"
-                      >
-                        I agree to the{" "}
-                        <span className="text-primary-600 hover:underline font-medium">
-                          Terms of Service
-                        </span>{" "}
-                        and{" "}
-                        <span className="text-primary-600 hover:underline font-medium">
-                          Privacy Policy
-                        </span>
-                      </label>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="gradient-btn w-full py-5 text-lg font-semibold shadow-glow-lg hover:shadow-glow-xl"
-                      disabled={!formData.agreeTerms}
-                    >
-                      Create My Account
-                    </button>
-                  </>
-                )}
+                <button
+                  type="submit"
+                  className="gradient-btn w-full py-5 text-lg font-semibold shadow-glow-lg hover:shadow-glow-xl"
+                  disabled={!formData.email || !formData.password}
+                >
+                  Create My Account
+                </button>
               </form>
 
               <div className="mt-10 text-center pt-8 border-t border-white/30">

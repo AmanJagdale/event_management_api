@@ -4,9 +4,6 @@ import { Upload, Quote, Plus, Trash2, Calendar, Users } from "lucide-react";
 
 export default function AdminDashboard() {
   const [file, setFile] = useState(null);
-  const [quotes, setQuotes] = useState([]);
-  const [newQuote, setNewQuote] = useState("");
-  const [newAuthor, setNewAuthor] = useState("");
   const [deleteTarget, setDeleteTarget] = useState("");
   const [members, setMembers] = useState([]);
   const [showMembers, setShowMembers] = useState(false);
@@ -23,21 +20,6 @@ export default function AdminDashboard() {
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    fetchQuotes();
-  }, []);
-
-  const fetchQuotes = async () => {
-    try {
-      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/quotes");
-      if (res.ok) {
-        const data = await res.json();
-        setQuotes(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -69,51 +51,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAddQuote = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/quotes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ text: newQuote, author: newAuthor }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        fetchQuotes();
-        setNewQuote("");
-        setNewAuthor("");
-        showMessage("Quote added successfully!");
-      } else {
-        showMessage(data.error || "Failed to add quote.", true);
-      }
-    } catch (err) {
-      console.error(err);
-      showMessage("Error adding quote.", true);
-    }
-  };
-
-  const handleDeleteQuote = async (id) => {
-    try {
-      const res = await fetch(`https://wdc-udaan-backend.onrender.com/api/quotes/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (res.ok) {
-        fetchQuotes();
-        showMessage("Quote deleted!");
-      } else {
-        showMessage("Failed to delete quote.", true);
-      }
-    } catch (err) {
-      console.error(err);
-      showMessage("Error deleting quote.", true);
-    }
-  };
 
   const handleDeleteMember = async (e) => {
     e.preventDefault();
@@ -255,57 +192,6 @@ export default function AdminDashboard() {
           </form>
         </motion.div>
 
-        {/* Quotes Manager */}
-        <motion.div
-          className="glass-card p-8"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <Quote className="w-8 h-8 text-pink-500" />
-            <h2 className="text-2xl font-bold text-gray-800">Quotes Manager</h2>
-          </div>
-          
-          <form onSubmit={handleAddQuote} className="space-y-4 mb-8">
-            <input
-              type="text"
-              placeholder="Quote Text"
-              required
-              value={newQuote}
-              onChange={(e) => setNewQuote(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-primary-500/20"
-            />
-            <input
-              type="text"
-              placeholder="Author"
-              value={newAuthor}
-              onChange={(e) => setNewAuthor(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-primary-500/20"
-            />
-            <button type="submit" className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-xl font-bold hover:shadow-lg transition-all">
-              <Plus className="w-5 h-5" /> Add Quote
-            </button>
-          </form>
-
-          <div className="space-y-4 max-h-64 overflow-y-auto pr-2">
-            {quotes.map((q) => (
-              <div key={q.id || q._id} className="flex justify-between items-center p-4 bg-white/60 rounded-xl border border-gray-100">
-                <div>
-                  <p className="font-medium text-[#4A4A4A]">"{q.text}"</p>
-                  <p className="text-sm text-gray-500">- {q.author || "Unknown"}</p>
-                </div>
-                <button
-                  onClick={() => handleDeleteQuote(q.id || q._id)}
-                  className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            ))}
-            {quotes.length === 0 && <p className="text-gray-500 text-center">No quotes available.</p>}
-          </div>
-        </motion.div>
 
         {/* Member Management */}
         <motion.div

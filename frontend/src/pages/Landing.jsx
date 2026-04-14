@@ -13,9 +13,7 @@ export default function Landing() {
           </div>
           <h1 className="text-2xl font-bold text-purple-900">WDC-Connect</h1>
         </div>
-        <Link to="/login" className="btn-primary text-sm">
-          Get Started
-        </Link>
+
       </nav>
 
       {/* Hero */}
@@ -37,21 +35,9 @@ export default function Landing() {
               Empower
             </span>
           </motion.h1>
-
-          <p className="text-xl md:text-2xl text-[#2C3E50] mb-12 max-w-2xl mx-auto leading-relaxed">
-            Women Development Cell platform for campus safety, events, and
-            community support. Your voice matters.
-          </p>
-
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
             <Link to="/login" className="btn-primary text-lg px-12 py-4">
-              Join Now <ArrowRight className="w-5 h-5 ml-2 inline" />
-            </Link>
-            <Link
-              to="/register"
-              className="px-12 py-4 border-2 border-purple-200 bg-white/50 backdrop-blur-md rounded-xl text-purple-900 font-semibold hover:bg-white hover:shadow-lg transition-all duration-300"
-            >
-              Learn More
+              Enter Portal <ArrowRight className="w-5 h-5 ml-2 inline" />
             </Link>
           </div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Hash } from "lucide-react";
+import { User, Mail } from "lucide-react";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -41,21 +41,6 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-white/50 p-4 rounded-xl border border-gray-100">
-          <Phone className="w-6 h-6 text-indigo-500" />
-          <div>
-            <p className="text-sm text-gray-500">Mobile Number</p>
-            <p className="font-semibold text-gray-800">{profile.phone || "Not Set"}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 bg-white/50 p-4 rounded-xl border border-gray-100">
-          <Hash className="w-6 h-6 text-pink-500" />
-          <div>
-            <p className="text-sm text-gray-500">Student ID</p>
-            <p className="font-semibold text-gray-800">{profile.student_id || "Not Set"}</p>
-          </div>
-        </div>
       </div>
     </motion.div>
   );
