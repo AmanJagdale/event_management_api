@@ -10,14 +10,17 @@ const app = express();
 
 // 1. ABSOLUTE TOP: CORS Configuration
 // Using a specific origin (your Vercel URL) is often more stable than 'true'
+// Add this near the top of server.js
 const corsOptions = {
-    origin: ['https://wdc-udaan.vercel.app', 'http://localhost:5173'],
+    origin: ["https://wdc-udaan.vercel.app", "http://localhost:5173"], // Ensure these match your URLs
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
+// This line below is the "Magic Fix" for the Delete CORS error
 app.options('*', cors(corsOptions)); // Explicitly handle all preflight requests
 
 // 2. Logging & Parsing
