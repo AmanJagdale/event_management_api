@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
@@ -8,36 +7,46 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
-// 1. ABSOLUTE TOP: CORS Configuration
-// Using a specific origin (your Vercel URL) is often more stable than 'true'
-// Add this near the top of server.js
-const corsOptions = {
-    origin: ["https://wdc-udaan.vercel.app", "http://localhost:5173"], // Ensure these match your URLs
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-    credentials: true,
-    optionsSuccessStatus: 200
-};
+// 1. MANUAL CORS HANDLER (Replaces the cors library)
+app.use((req, res, next) => {
+    const allowedOrigins = ["https://wdc-udaan.vercel.app", "http://localhost:5173"];
+    const origin = req.headers.origin;
 
-app.use(cors(corsOptions));
-// This line below is the "Magic Fix" for the Delete CORS error
-app.options('*', cors(corsOptions)); // Explicitly handle all preflight requests
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        // Fallback for testing
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
 
-// 2. Logging & Parsing
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    // 2. THE PREFLIGHT KILLER
+    // This intercepts the 'OPTIONS' request and answers it immediately with a 200 OK.
+    // This stops the browser from ever seeing a "CORS Error."
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+// 3. Logging & Parsing
 app.use((req, res, next) => {
     console.log(`${req.method} request hit at: ${req.url}`);
     next();
 });
 app.use(express.json());
 
-// 3. Routes
+// 4. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 
 // Base route for testing
 app.get('/', (req, res) => {
-    res.send('Backend is Alive and CORS is configured.');
+    res.send('Backend is Alive - Manual CORS Active.');
 });
 
 // Impact Meter
