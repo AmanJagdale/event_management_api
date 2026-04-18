@@ -29,7 +29,8 @@ export default function AdminDashboard() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/users/admin/upload-members", {
+
+      const res = await fetch("https://wdc-udaan-backend.onrender.com/api/users/bulk-upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -169,7 +170,7 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-bold text-gray-800">Bulk Upload Members</h2>
           </div>
           <p className="text-gray-600 mb-6">Upload a CSV file to add multiple members at once.</p>
-          
+
           <form onSubmit={handleUpload} className="space-y-4">
             <input
               type="file"
@@ -207,7 +208,7 @@ export default function AdminDashboard() {
           <button onClick={fetchMembers} className="w-full py-3 px-6 border-2 border-primary-200 text-primary-600 font-semibold rounded-2xl hover:bg-primary-50 transition-all duration-200 mb-6">
             {showMembers ? "Hide Members" : "View All Members"}
           </button>
-          
+
           {showMembers && (
             <div className="space-y-3 mb-6 max-h-64 overflow-y-auto pr-2">
               {members.map(m => (
@@ -256,15 +257,15 @@ export default function AdminDashboard() {
             </button>
           ) : (
             <form onSubmit={handleCreateEvent} className="space-y-4 mb-4">
-              <input type="text" placeholder="Event Title" required value={eventForm.title} onChange={(e) => setEventForm({...eventForm, title: e.target.value})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
-              <select required value={eventForm.type} onChange={(e) => setEventForm({...eventForm, type: e.target.value})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20">
+              <input type="text" placeholder="Event Title" required value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
+              <select required value={eventForm.type} onChange={(e) => setEventForm({ ...eventForm, type: e.target.value })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20">
                 <option value="workshop">Workshop</option>
                 <option value="seminar">Seminar</option>
               </select>
-              <input type="text" placeholder="Category (e.g. Session)" required value={eventForm.category} onChange={(e) => setEventForm({...eventForm, category: e.target.value})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
-              <input type="date" required value={eventForm.date} onChange={(e) => setEventForm({...eventForm, date: e.target.value})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
-              <input type="number" placeholder="Capacity" required value={eventForm.capacity} onChange={(e) => setEventForm({...eventForm, capacity: parseInt(e.target.value) || ''})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
-              <textarea placeholder="Description" value={eventForm.description} onChange={(e) => setEventForm({...eventForm, description: e.target.value})} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20"></textarea>
+              <input type="text" placeholder="Category (e.g. Session)" required value={eventForm.category} onChange={(e) => setEventForm({ ...eventForm, category: e.target.value })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
+              <input type="date" required value={eventForm.date} onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
+              <input type="number" placeholder="Capacity" required value={eventForm.capacity} onChange={(e) => setEventForm({ ...eventForm, capacity: parseInt(e.target.value) || '' })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20" />
+              <textarea placeholder="Description" value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} className="w-full px-4 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:ring-4 focus:ring-indigo-500/20"></textarea>
               <div className="flex gap-2 w-full">
                 <button type="submit" className="flex-1 gradient-btn py-3">Create</button>
                 <button type="button" onClick={() => setShowEventForm(false)} className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl font-bold hover:bg-gray-50">Cancel</button>
