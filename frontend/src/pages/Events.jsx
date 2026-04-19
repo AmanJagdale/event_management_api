@@ -12,10 +12,23 @@ export default function Events() {
   const [sortBy, setSortBy] = useState("date");
 
   useEffect(() => {
-    fetch("https://wdc-udaan-backend.onrender.com/api/events")
-      .then(res => res.json())
-      .then(data => setEvents(data))
-      .catch(err => console.error(err));
+    const token = localStorage.getItem("token"); // Get your login token
+
+    fetch("https://event-management-api-uy6h.onrender.com/api/events", {
+      headers: {
+        "Authorization": `Bearer ${token}`, // Send the token to the backend
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch events");
+        return res.json();
+      })
+      .then(data => {
+        console.log("Events received:", data); // Check your console to see the data
+        setEvents(data);
+      })
+      .catch(err => console.error("Fetch error:", err));
   }, []);
 
   const filteredEvents = events.filter((event) => {
@@ -73,11 +86,10 @@ export default function Events() {
           {categories.map((category) => (
             <motion.button
               key={category}
-              className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 border-2 ${
-                activeCategory === category
-                  ? "bg-gradient-to-r from-primary-500 to-pink-400 text-white border-transparent shadow-glow"
-                  : "border-gray-200 bg-white/50 hover:border-primary-200 hover:shadow-md"
-              }`}
+              className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 border-2 ${activeCategory === category
+                ? "bg-gradient-to-r from-primary-500 to-pink-400 text-white border-transparent shadow-glow"
+                : "border-gray-200 bg-white/50 hover:border-primary-200 hover:shadow-md"
+                }`}
               onClick={() => setActiveCategory(category)}
               whileTap={{ scale: 0.98 }}
             >
