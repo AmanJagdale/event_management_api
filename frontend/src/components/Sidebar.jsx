@@ -56,7 +56,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    WDC-Connect
+                    WDC UDAAN
                   </h1>
                   <p className="text-sm text-gray-500">Empower Her</p>
                 </div>
@@ -103,7 +103,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                WDC-Connect
+                WDC UDAAN
               </h1>
               <p className="text-sm text-gray-500">Empower Her</p>
             </div>

@@ -64,7 +64,7 @@ export default function Register() {
                   <School className="w-16 h-16 text-white" />
                 </div>
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-100 bg-clip-text mb-4">
-                  Welcome to WDC-Connect
+                  Welcome to WDC UDAAN
                 </h2>
                 <p className="text-xl text-[#4A4A4A] max-w-md mx-auto leading-relaxed">
                   Join our safe community dedicated to empower and support women
@@ -96,7 +96,7 @@ export default function Register() {
                   Create Account
                 </h1>
                 <p className="text-gray-600">
-                  Join WDC-Connect in 1 simple step
+                  Join WDC UDAAN in 1 simple step
                 </p>
 
                 {errorMsg && (

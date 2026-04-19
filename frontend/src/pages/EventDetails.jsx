@@ -151,12 +151,12 @@ export default function EventDetails() {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/30">
-                  <button 
-                    onClick={handleRegister} 
-                    disabled={isRegistered || isFull || !token} 
+                  <button
+                    onClick={handleRegister}
+                    disabled={isRegistered || isFull || !token}
                     className={`flex-1 text-lg font-semibold py-4 rounded-xl transition-all ${isRegistered ? "bg-emerald-100 text-emerald-700 cursor-not-allowed" : isFull ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "gradient-btn"}`}
                   >
-                    {isRegistered ? "Already Registered" : isFull ? "Event Full" : !token ? "Login to Register" : "Register Now"} 
+                    {isRegistered ? "Already Registered" : isFull ? "Event Full" : !token ? "Login to Register" : "Register Now"}
                     {(!isRegistered && !isFull && token) && <Users className="w-5 h-5 ml-2 inline" />}
                   </button>
                   <button className="flex-1 py-4 px-6 border-2 border-primary-200 text-primary-600 font-semibold rounded-2xl hover:bg-primary-50 hover:shadow-glow transition-all">
@@ -177,16 +177,16 @@ export default function EventDetails() {
                     <Users className="w-6 h-6 text-primary-500 ml-2" />
                   </div>
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div className="w-full bg-gray-100 rounded-full h-3 mb-4 overflow-hidden shadow-inner">
-                  <div 
+                  <div
                     className={`h-3 rounded-full transition-all duration-1000 ${isFull ? "bg-red-500" : "bg-gradient-to-r from-primary-400 to-pink-400"}`}
                     style={{ width: `${Math.min((event.current_registrations / event.capacity) * 100, 100)}%` }}
                   />
                 </div>
                 <p className="text-sm text-gray-500 font-medium">
-                  {event.capacity - event.current_registrations > 0 
+                  {event.capacity - event.current_registrations > 0
                     ? `${event.capacity - event.current_registrations} slots remaining`
                     : "Fully booked"}
                 </p>
