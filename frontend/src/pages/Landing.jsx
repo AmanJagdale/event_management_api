@@ -11,7 +11,7 @@ export default function Landing() {
           <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
             <span className="text-2xl font-bold text-white">W</span>
           </div>
-          <h1 className="text-2xl font-bold text-purple-900">WDC-Connect</h1>
+          <h1 className="text-2xl font-bold text-purple-900">WDC UDAAN</h1>
         </div>
 
       </nav>
