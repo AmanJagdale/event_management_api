@@ -9,7 +9,10 @@ export default function AdminDashboard() {
   const [members, setMembers] = useState([]);
   const [showMembers, setShowMembers] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: "", type: "workshop", category: "", date: "", capacity: 50, description: "" });
+  const [eventForm, setEventForm] = useState({ title: "", type: "workshop", category: "", date: "", capacity: 50, description: "", location: "", event_time: "", mentor_name: "" });
+  const [eventsList, setEventsList] = useState([]);
+  const [showEventsList, setShowEventsList] = useState(false);
+  const [participantsModal, setParticipantsModal] = useState({ show: false, participants: [], count: 0, loading: false });
 
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -103,6 +106,43 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchEventsList = async () => {
+    if (showEventsList) {
+      setShowEventsList(false);
+      return;
+    }
+    try {
+      const res = await fetch("https://event-management-api-uy6h.onrender.com/api/events");
+      if (res.ok) {
+        const data = await res.json();
+        setEventsList(data);
+        setShowEventsList(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleViewParticipants = async (eventId) => {
+    setParticipantsModal({ show: true, participants: [], count: 0, loading: true });
+    try {
+      const res = await fetch(`https://event-management-api-uy6h.onrender.com/api/events/${eventId}/registrations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setParticipantsModal({ show: true, participants: data.participants, count: data.count, loading: false });
+      } else {
+        showMessage("Failed to fetch participants.", true);
+        setParticipantsModal({ show: false, participants: [], count: 0, loading: false });
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage("Error fetching participants.", true);
+      setParticipantsModal({ show: false, participants: [], count: 0, loading: false });
+    }
+  };
+
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
@@ -116,7 +156,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         showMessage("Event created successfully!");
-        setEventForm({ title: '', type: 'workshop', category: '', date: '', capacity: 50, description: '' });
+        setEventForm({ title: '', type: 'workshop', category: '', date: '', location: '', event_time: '', mentor_name: '', capacity: 50, description: '' });
         setShowEventForm(false);
       } else {
         const data = await res.json();
@@ -403,6 +443,15 @@ export default function AdminDashboard() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <input type="date" required value={eventForm.date} onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })} className="w-full px-5 py-4 border border-indigo-100 rounded-xl bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all font-medium text-gray-700" />
+                      <input type="time" placeholder="Event Time" required value={eventForm.event_time} onChange={(e) => setEventForm({ ...eventForm, event_time: e.target.value })} className="w-full px-5 py-4 border border-indigo-100 rounded-xl bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all font-medium text-gray-700" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <input type="text" placeholder="Location" value={eventForm.location} onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })} className="w-full px-5 py-4 border border-indigo-100 rounded-xl bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all placeholder:text-gray-400 font-medium text-gray-800" />
+                      <input type="text" placeholder="Mentor Name" value={eventForm.mentor_name} onChange={(e) => setEventForm({ ...eventForm, mentor_name: e.target.value })} className="w-full px-5 py-4 border border-indigo-100 rounded-xl bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all placeholder:text-gray-400 font-medium text-gray-800" />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
                       <input type="number" placeholder="Capacity" required value={eventForm.capacity} onChange={(e) => setEventForm({ ...eventForm, capacity: parseInt(e.target.value) || '' })} className="w-full px-5 py-4 border border-indigo-100 rounded-xl bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all placeholder:text-gray-400 font-medium text-gray-800" />
                     </div>
 
@@ -415,10 +464,108 @@ export default function AdminDashboard() {
                   </form>
                 )}
               </motion.div>
+
+              {/* View Events & Participants */}
+              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="glass-card">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-[1.7rem] font-bold font-playfair text-[#1e1b4b] mb-1">Events Directory</h2>
+                    <p className="text-gray-500 text-sm font-medium">View events and track participants.</p>
+                  </div>
+                  <div className="p-3.5 bg-[#4338ca]/10 rounded-2xl text-[#4338ca]">
+                    <Activity size={24} />
+                  </div>
+                </div>
+
+                <button onClick={fetchEventsList} className="w-full py-4 px-6 border-2 border-[#4338ca]/20 text-[#4338ca] bg-[#4338ca]/5 font-bold rounded-xl hover:bg-[#4338ca] hover:text-white hover:border-[#4338ca] transition-all duration-300 mb-8 flex items-center justify-center gap-2 group shadow-sm">
+                  {showEventsList ? "Hide Events List" : "Load Events Directory"}
+                  <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+                </button>
+
+                <AnimatePresence>
+                  {showEventsList && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mb-8">
+                      <div className="max-h-[320px] overflow-y-auto rounded-xl border border-gray-200 shadow-inner bg-white custom-scrollbar">
+                        <table className="w-full text-left border-collapse whitespace-nowrap">
+                          <thead>
+                            <tr className="bg-slate-50/80 border-b border-gray-200 sticky top-0 backdrop-blur-md z-10">
+                              <th className="p-4 py-4 pl-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Title</th>
+                              <th className="p-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                              <th className="p-4 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">Registrations</th>
+                              <th className="p-4 py-4 pr-6 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">Participants</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {eventsList.map((e, idx) => (
+                              <tr key={e.id} className={`border-b border-gray-50 transition-colors hover:bg-indigo-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
+                                <td className="p-4 pl-6 text-gray-800 font-semibold max-w-[200px] truncate" title={e.title}>{e.title}</td>
+                                <td className="p-4 text-gray-500 text-sm">{new Date(e.date).toLocaleDateString()}</td>
+                                <td className="p-4 text-center">
+                                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                                    {e.current_registrations || 0} / {e.capacity}
+                                  </span>
+                                </td>
+                                <td className="p-4 pr-6 text-center">
+                                  <button onClick={() => handleViewParticipants(e.id)} className="px-4 py-2 bg-[#4338ca] hover:bg-[#3730a3] text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+                                    View
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                            {eventsList.length === 0 && (
+                              <tr><td colSpan="4" className="p-10 text-center text-gray-400 font-medium tracking-wide">No events found.</td></tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Participants Modal */}
+      <AnimatePresence>
+        {participantsModal.show && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Event Participants</h3>
+                  <p className="text-sm text-gray-500 font-medium mt-1">Total Registered: {participantsModal.count}</p>
+                </div>
+                <button onClick={() => setParticipantsModal({ show: false, participants: [], count: 0, loading: false })} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+                  <Activity className="rotate-45" size={20} />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+                {participantsModal.loading ? (
+                  <div className="py-10 flex justify-center"><div className="w-8 h-8 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" /></div>
+                ) : (
+                  <div className="space-y-3">
+                    {participantsModal.participants.length > 0 ? participantsModal.participants.map((p, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                        <span className="font-semibold text-gray-800">{p.email}</span>
+                        <span className="text-xs text-gray-500 font-medium bg-white px-3 py-1 rounded-full border border-gray-200">
+                          {new Date(p.registered_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )) : (
+                      <div className="text-center py-10 text-gray-500 font-medium">No registrations yet.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="p-5 border-t border-gray-100 bg-slate-50/50 flex justify-end">
+                <button onClick={() => setParticipantsModal({ show: false, participants: [], count: 0, loading: false })} className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl transition-colors">Close</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -3,7 +3,7 @@ const { sendConfirmationEmail } = require('../services/emailService');
 
 // POST /events: Create a new event
 exports.createEvent = async (req, res) => {
-  const { title, description, type, category, date, capacity } = req.body;
+  const { title, description, type, category, date, location, event_time, mentor_name, capacity } = req.body;
 
   if (!title || !type || !date || !capacity) {
     return res.status(400).json({ error: 'Please provide all required fields (title, type, date, capacity).' });
@@ -11,8 +11,8 @@ exports.createEvent = async (req, res) => {
 
   try {
     const result = await db.query(
-      'INSERT INTO events (title, description, type, category, date, capacity) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [title, description || null, type, category || null, date, capacity]
+      'INSERT INTO events (title, description, type, category, date, location, event_time, mentor_name, capacity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      [title, description || null, type, category || null, date, location || null, event_time || null, mentor_name || null, capacity]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -25,16 +25,19 @@ exports.getEvents = async (req, res) => {
   const { category } = req.query;
 
   try {
-    // 1. Simplified query to ensure it doesn't crash on missing tables
-    let queryStr = `SELECT * FROM events`;
+    let queryStr = `
+      SELECT e.*, COUNT(r.id) AS current_registrations
+      FROM events e
+      LEFT JOIN registrations r ON e.id = r.event_id
+    `;
     const params = [];
 
     if (category) {
-      queryStr += ` WHERE category = $1`;
+      queryStr += ` WHERE e.category = $1`;
       params.push(category);
     }
 
-    queryStr += ` ORDER BY date ASC`;
+    queryStr += ` GROUP BY e.id ORDER BY e.date ASC`;
 
     const result = await db.query(queryStr, params);
 
@@ -51,8 +54,7 @@ exports.getEvents = async (req, res) => {
 
       return {
         ...event,
-        // We set current_registrations to 0 for now since we are bypassing the Join
-        current_registrations: 0,
+        current_registrations: parseInt(event.current_registrations, 10) || 0,
         status
       };
     });
@@ -64,9 +66,66 @@ exports.getEvents = async (req, res) => {
   }
 };
 
-// POST /register-event
+exports.getEventById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db.query(`
+      SELECT e.*, COUNT(r.id) AS current_registrations
+      FROM events e
+      LEFT JOIN registrations r ON e.id = r.event_id
+      WHERE e.id = $1
+      GROUP BY e.id
+    `, [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Event not found.' });
+    }
+    
+    const event = result.rows[0];
+    event.current_registrations = parseInt(event.current_registrations, 10) || 0;
+    res.json(event);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error while fetching event.' });
+  }
+};
+
+exports.getEventRegistrations = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db.query(`
+      SELECT u.email, r.registered_at
+      FROM registrations r
+      JOIN users u ON r.user_id = u.id
+      WHERE r.event_id = $1
+      ORDER BY r.registered_at DESC
+    `, [id]);
+    
+    res.json({
+      count: result.rows.length,
+      participants: result.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error while fetching participants.' });
+  }
+};
+
+exports.checkRegistrationState = async (req, res) => {
+  const { id } = req.params;
+  const user_id = req.user.id;
+  try {
+    const result = await db.query('SELECT * FROM registrations WHERE user_id = $1 AND event_id = $2', [user_id, id]);
+    res.json({ isRegistered: result.rows.length > 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error while checking registration.' });
+  }
+};
+
+// POST /events/:id/register
 exports.registerEvent = async (req, res) => {
-  const { event_id } = req.body;
+  const { id: event_id } = req.params;
   const user_id = req.user.id;
 
   try {
