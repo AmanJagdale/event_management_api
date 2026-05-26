@@ -48,5 +48,3 @@ src/
 ├── data/           # Mock data
 └── utils/          # Utilities
 ```
-
-Built by BLACKBOXAI
